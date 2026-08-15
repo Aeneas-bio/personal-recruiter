@@ -10,20 +10,22 @@ This is the recurring engine behind a personalized job search. It only works wel
 ## Inputs
 
 You need, at minimum:
-- **A persona file** (built by `job-scan-setup`, following `job-scan-setup/assets/persona_template.md`'s structure) — read the ENTIRE file every run, not a cached summary. People edit these between runs specifically to fix mistakes; skipping the fresh read defeats the purpose.
-- **A tracker spreadsheet path** — the running record of every lead, applied or not.
+- **A persona location** (built by `job-scan-setup`, following `job-scan-setup/assets/persona_template.md`'s structure) — read via `PersonaStore.read()`, in full, every run, not a cached summary. People edit these between runs specifically to fix mistakes; skipping the fresh read defeats the purpose.
+- **A job tracker location** — the running record of every lead, applied or not, accessed via `JobStore`.
 
-If either is missing or clearly stale/placeholder (template text never filled in), stop and say so rather than guessing — this almost always means onboarding wasn't finished, and a scan run on an empty rubric produces noise, not leads.
+Both the persona and job backends, and their locations, come from the `storage:` block in persona Section 0 (see `job-scan-setup/assets/storage_backends.md`). Read that block first — before anything else — to know which `PersonaStore`/`JobStore` implementation to use for the rest of this run. Persona and job backends can differ (e.g. persona in Notion, jobs in Jira); never assume they match. All storage operations below go through the `PersonaStore`/`JobStore` interface, never backend-specific mechanics directly — if a step here describes something a chosen backend can't do in-place (see the capability table in `storage_backends.md`), say so rather than working around it silently.
+
+If the persona location, job tracker location, or the `storage:` block itself is missing or clearly stale/placeholder (template text never filled in), stop and say so rather than guessing — this almost always means onboarding wasn't finished, and a scan run on an empty rubric produces noise, not leads.
 
 ## Step 1 — Load the persona and treat it as the rubric of record
 
-Read the full persona file. Pay particular attention to:
+Read the full persona via `PersonaStore.read()`. Pay particular attention to:
 - Section 4's Disqualifiers and Positive reinforcement — these exist because a generic scorer got something wrong in the past. They override generic judgment.
 - Section 10's Calibration Log — the most recent entries are the freshest signal about what to change. If a log entry contradicts something earlier in the document, the log wins (it's the correction).
 
 ## Step 2 — Stale-posting sweep (if enabled in the persona file's Section 9)
 
-For every tracker row with a real URL in Job Link AND an empty/unclear Decision Date: follow the link. If dead/expired/no-longer-accepting, set Decision Date = today, Outcome = "Cold Posting," and append a short note (preserve any prior status text rather than replacing it). If live, capture the Posted Date if shown. Don't overwrite rows that already carry a richer, current status (e.g., "Application Submitted," "Reviewed - not a fit") — for those, only note liveness if it adds information.
+Use `JobStore.list()` to get every record still open — stage `sourced` or `applied`, with no terminal outcome yet — and follow each one's `url`. If dead/expired/no-longer-accepting, call `JobStore.retire(job_id, reason)`, preserving any existing notes rather than replacing them. If live, note the posted date if shown, via `JobStore.update(job_id, {...})`, without touching stage. Don't overwrite records that already carry a richer, current stage (e.g., `interviewing`, `rejected`) — for those, only note liveness if it adds information.
 
 Never attempt to use or ask for account credentials to get past a login wall. If a link is genuinely gated with no existing session, leave it and report it under "needs sign-in" in the final summary.
 
@@ -42,15 +44,15 @@ This is the step most likely to go wrong via shortcut, so slow down here specifi
 
 ## Step 5 — Dedupe
 
-Never add a row that's already in the tracker. Match on Job Link first; if that's ambiguous (some boards recycle or repost with new IDs), match on Company + closely-matching Title. If a role is a near-duplicate of an existing row (reposted, slightly retitled), note that rather than adding a new row.
+Never add a record that's already in the tracker. Check via `JobStore.find_by_url(url)` first; if that's ambiguous (some boards recycle or repost with new IDs), fall back to `JobStore.list()` and match on Company + closely-matching Title. If a role is a near-duplicate of an existing record (reposted, slightly retitled), note that on the existing record rather than creating a new one.
 
-## Step 6 — Append qualifying rows
+## Step 6 — Append qualifying records
 
-Follow the tracker's column structure from persona Section 6 exactly — the columns and their order matter because this file gets read programmatically on every run, including by future runs of this same skill. Before writing, make a timestamped backup of the tracker file. After writing, verify the file still opens correctly and no sheets were lost — spreadsheet tools can silently corrupt files on save if interrupted mid-write; if a save produces a file that won't reopen cleanly, don't overwrite the last known-good version, and tell the person what happened.
+Create one record per qualifying role via `JobStore.create(record)`, populated with the standard `JobRecord` fields (`title, company, url, source_board, date_found, stage, fit_score, salary_min, salary_max, salary_disclosed, notes, tailored_docs_url`) as defined in `storage_backends.md` — the field set is the same regardless of backend, so no backend-specific column mapping is needed here. New records start at stage `sourced`. If the backend's create operation fails or returns something unexpected, don't retry blindly — surface it in the summary rather than silently dropping the lead.
 
 ## Step 7 — Auto-tailor documents, if enabled (persona Section 8)
 
-For any new row at or above the configured fit threshold: draft a tailored CV and cover letter from the person's real base documents, using the document-editing capability available in this environment. Keep every claim truthful to the persona file — never invent experience, credentials, or accomplishments the person doesn't actually have, even if it would make the fit look stronger. Save drafts to a per-job folder with `_draft` in every filename, and link them in the tracker's CV Link / Cover Letter Link columns. Never point those columns at the person's pre-existing real documents.
+For any new record at or above the configured fit threshold: draft a tailored CV and cover letter from the person's real base documents, using the document-editing capability available in this environment. Keep every claim truthful to the persona file — never invent experience, credentials, or accomplishments the person doesn't actually have, even if it would make the fit look stronger. Save drafts to a per-job folder with `_draft` in every filename, and record the link via `JobStore.update(job_id, {tailored_docs_url: ...})`. Never point that field at the person's pre-existing real documents.
 
 ## Step 8 — Deliver the summary
 
