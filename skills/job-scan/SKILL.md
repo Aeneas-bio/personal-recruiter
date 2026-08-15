@@ -33,12 +33,15 @@ Never attempt to use or ask for account credentials to get past a login wall. If
 
 Use the board list and search-title seeds from the persona's Section 5. Prefer recent postings (roughly the last week, or since the last run, whichever is longer) but don't hard-exclude a strong older posting that's still live — note its age in the summary so the person can judge urgency themselves.
 
+Title-seed search alone under-surfaces roles that fit Section 2's Problems of interest but use a title that isn't in the seed list (a smaller company solving the same problem under a differently-titled role, for instance). Where a board supports it, also run a description/full-text search using language pulled from the Problems of interest themselves, not just the title seeds — treat this as a supplement to the title search, not a replacement.
+
 For each promising result, get the canonical URL and enough of the actual responsibilities section to score it properly — a title and a two-line teaser is not enough to apply Section 4's rubric. Open the posting, or use a targeted search for the exact title + company if the board's own listing doesn't expose the full text.
 
 ## Step 4 — Score every candidate against Section 4 of the persona
 
 This is the step most likely to go wrong via shortcut, so slow down here specifically:
 - Score based on how the required skills are actually applied in the responsibilities, not on how many keywords from Section 1 appear. A role can look like a bullseye on title and buzzwords and still be the wrong day-to-day work — that's exactly what Section 4's disqualifiers exist to catch. Read them like a checklist before finalizing any score.
+- Score Problem fit deliberately, not as an afterthought folded into domain — read the responsibilities and ask which of Section 2's Problems of interest (if any) this role would actually have the person spending their time on. A role that names the right domain but whose day-to-day is a different problem than any on the list should score low here even if everything else looks strong.
 - Apply the salary rule and location scoring exactly as the persona defines them.
 - Where a role sits right at the edge of a disqualifier category (e.g., senior enough to be in scope but at a company type the person has historically not converted with), still surface it — flag the caveat in Notes rather than silently dropping it. The person deciding not to pursue something is a better outcome than never seeing it.
 

@@ -42,6 +42,8 @@ Fill this in from the CVs, cover letters, and LinkedIn profile. Write it the way
 
 **Target role families (priority order):** _(list the 3–7 role/domain families this person is actually targeting, in order of demonstrated interest — inferred from what they've applied to, not just what they say they want. If those two things disagree, ask about the gap rather than picking one.)_
 
+**Problems of interest:** _(the specific problems — not just the domain — this person wants to spend their next role solving. "Healthcare AI" is a domain; "getting clinicians out from under documentation burden with ambient capture" is a problem. Ask directly: not what industry, but what actual problem, stated the way they'd explain it to a peer. List 2–5, each with a line on why it matters to them if that came up in the interview. These drive the Problem fit component of Section 4's rubric — a role can nail the domain and title and still be a weak match if the actual day-to-day problem it's solving isn't one of these.)_
+
 **Employers of interest (pattern, not exhaustive list):** _(the kinds of organizations — company size, sector, mission — this person gravitates toward, drawn from their application history)_
 
 **Salary floor:** _(a hard number or range below which a role isn't worth surfacing. Ask directly — don't infer this from past offers alone, people's floors change.)_
@@ -75,11 +77,12 @@ Ask the person what threshold they want to start at (a reasonable default to sug
 
 Weighted rubric — this structure is intentionally generic; the scoring judgment underneath it is what makes it personal:
 
-- **Title & seniority match (0–25):** Exact target family at target level = 20–25; adjacent leadership = 12–19; IC/too-junior or off-domain = 0–11.
-- **Domain overlap (0–30):** How much the role's actual subject matter overlaps this person's core domain (not just adjacent buzzwords). Strong core = 24–30; partial/general = 14–23; weak = 0–13.
-- **Skill/keyword overlap (0–20):** Density of matched terms from the Section 1 keyword bank, in the title AND the body of the responsibilities — not just the requirements list.
-- **Strategic/leadership fit (0–15):** Team-building, budget/P&L ownership, strategy-setting, stakeholder management, storytelling — whatever this person's actual leadership signature is.
-- **Mission alignment (0–10):** Does the role's stated purpose match what this person says drives them (Section 1 signature themes)?
+- **Title & seniority match (0–20):** Exact target family at target level = 16–20; adjacent leadership = 9–15; IC/too-junior or off-domain = 0–8.
+- **Domain overlap (0–20):** How much the role's actual subject matter overlaps this person's core domain (not just adjacent buzzwords). Strong core = 16–20; partial/general = 9–15; weak = 0–8.
+- **Problem fit (0–25):** Does the role's actual day-to-day work — the responsibilities, not the department name — map to one of Section 2's Problems of interest? This is the single most important signal to get right, and the easiest one to fake by skimming: a role can sit in the right domain and still spend most of its time on a problem this person explicitly isn't excited about. Genuinely working on one of the listed problems, framed the way the person framed it = 20–25; adjacent problem in the same space = 10–19; domain match but no real overlap with any listed problem = 0–9. If a role clearly maps to a problem NOT on the list but seems like a strong match anyway, still score it fairly and flag it in Notes — this might be a gap in Section 2 worth adding via the Calibration Log, not a reason to suppress the lead.
+- **Skill/keyword overlap (0–15):** Density of matched terms from the Section 1 keyword bank, in the title AND the body of the responsibilities — not just the requirements list.
+- **Strategic/leadership fit (0–10):** Team-building, budget/P&L ownership, strategy-setting, stakeholder management, storytelling — whatever this person's actual leadership signature is.
+- **Mission alignment (0–10):** Does the role's stated purpose match what this person says drives them (Section 1 signature themes)? Distinct from Problem fit above — mission is *why* the org exists, problem fit is *what work* the role actually does day to day; a role can hit one without the other.
 
 **The most important instruction in this whole rubric, repeated because it's the thing that goes wrong first:** score based on how the target skills are actually *applied* in the responsibilities section of the JD, not on title or keyword density alone. A title can have every right word in it and still describe work this person doesn't want (see Disqualifiers below) — and a plainer title can still be a bullseye. Read the JD like a recruiter who has to defend the shortlist, not like a keyword matcher.
 
@@ -98,7 +101,7 @@ Typical categories worth asking about explicitly (fill in with this person's rea
 
 Also starts empty. Fill in from the interview and from roles this person got excited about (even if they didn't get an offer) — what made those roles score obviously high? Note the pattern here so future scans recognize it without re-deriving it every time.
 
-**Decision rule:** add to tracker if `Fit ≥ [threshold]` AND (`salary range touches the floor` OR `no salary posted`), AND not in a Disqualifier/Paused category. Dedupe against existing tracker rows (same company + similar title, or same job link). If the person already applied to a role that closed and reopened, score it on merit but note that in Outcome rather than skipping it.
+**Decision rule:** create a job record if `Fit ≥ [threshold]` AND (`salary range touches the floor` OR `no salary posted`), AND not in a Disqualifier/Paused category. Dedupe against existing records via `JobStore.find_by_url()`, falling back to company + similar title. If the person already applied to a role that closed and reopened, score it on merit but note that in the record's `notes` rather than skipping it.
 
 ---
 
@@ -132,12 +135,12 @@ Field notes (map these onto whichever backend-native property/column names the c
 
 ## 7. Run protocol (what `job-scan` does each time it runs)
 
-1. Stale-posting sweep — check open, unresolved tracker rows with real links; retire dead postings.
-2. Scan configured boards for the search seeds across configured geographies.
-3. Score fit + location (read responsibilities, apply disqualifiers/penalties); test the salary rule; flag missing salary.
-4. Dedupe against existing tracker rows.
-5. Append qualifying rows.
-6. For any row clearing the auto-tailoring threshold, generate draft documents (Section 8).
+1. Stale-posting sweep — check open, unresolved job records with real links; retire dead postings.
+2. Scan configured boards for the search seeds (and, per Section 2's Problems of interest, supplemental description-level searches) across configured geographies.
+3. Score fit + location (read responsibilities, apply disqualifiers/penalties and Problem fit); test the salary rule; flag missing salary.
+4. Dedupe against existing job records.
+5. Create qualifying job records.
+6. For any record clearing the auto-tailoring threshold, generate draft documents (Section 8).
 7. Deliver a summary (Section 8 of the `job-scan-setup` config decides where: chat channel, email draft, or just a saved report).
 8. Pause and ask if a strong title/JD match is genuinely ambiguous on fit — otherwise proceed autonomously.
 
@@ -150,10 +153,10 @@ Ask during onboarding whether this person wants this at all, and if so, at what 
 1. Start from this person's real base CV and cover letter (ask which files during onboarding).
 2. Tailor emphasis and language to the specific JD's responsibilities and keywords, using Section 1's real language — never invent experience, credentials, or claims this person doesn't actually have.
 3. Save into a per-job folder, e.g. `_AutoTailored/{Company}_{ShortTitle}/`, with `_draft` appended to every filename.
-4. Put the new draft paths in the tracker's `CV Link` / `Cover Letter Link` columns for that row.
+4. Put the new draft paths in the record's `tailored_docs_url` field via `JobStore.update()`.
 5. Note "auto-draft, review before use" — these are first drafts for the person to edit, not final documents.
 
-If this feature is declined during onboarding, leave `CV Link` / `Cover Letter Link` blank always and skip this step.
+If this feature is declined during onboarding, leave `tailored_docs_url` unset always and skip this step.
 
 ---
 
@@ -161,9 +164,9 @@ If this feature is declined during onboarding, leave `CV Link` / `Cover Letter L
 
 Ask during onboarding whether this person wants this at all (it's cheap and generally worth it, but it does spend time following links).
 
-For every tracker row with a real URL in `Job Link` AND an empty/unclear `Decision Date`: follow the link. If the posting is gone/expired/no-longer-accepting, set `Decision Date` = today and `Outcome = "Cold Posting"`, appending a short note (preserve any prior status text). If live, capture the Posted Date if shown. Don't overwrite rows that already carry a richer, current status (e.g., "Application Submitted," "Reviewed - not a fit") — for those, only note liveness if useful.
+For every open job record (stage `sourced` or `applied`) with a real `url`: follow the link. If the posting is gone/expired/no-longer-accepting, call `JobStore.retire(job_id, reason)`, preserving any prior notes. If live, capture the posted date if shown via `JobStore.update()`, without touching stage. Don't overwrite records that already carry a richer, current stage (e.g., `interviewing`, `rejected`) — for those, only note liveness if useful.
 
-**Authentication rule:** never collect, store, type, or ask for this person's account passwords. If a link is genuinely behind a login wall with no existing session, leave that row unchanged and report it under "needs sign-in" rather than attempting credentials.
+**Authentication rule:** never collect, store, type, or ask for this person's account passwords. If a link is genuinely behind a login wall with no existing session, leave that record unchanged and report it under "needs sign-in" rather than attempting credentials.
 
 ---
 

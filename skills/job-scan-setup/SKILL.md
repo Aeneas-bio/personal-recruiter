@@ -30,8 +30,9 @@ Ask for, in this order:
 2. **A folder or set of cover letters**, if they have any saved. Cover letters are the best source for a person's actual voice and stated motivation — mine them for language, not just facts.
 3. **Their LinkedIn profile URL, and recent posts if they write publicly.** If you have browser access, read the profile directly rather than asking them to describe it.
 4. **Direct follow-up questions** to fill gaps the documents don't cover: certifications, side projects, specific tools/platforms they're deep in but might not have listed, what they'd say is their biggest unlisted strength, and — importantly — what they explicitly do NOT want to keep doing even if it's adjacent to their experience.
+5. **Problems of interest.** Ask this as its own, separate question — it's easy to conflate with domain and the two aren't the same thing. Don't ask "what industry?" Ask: "what specific problems do you actually want to be solving in your next role?" Push for the shape of the problem, not a domain label — "healthcare AI" is a domain; "getting clinicians out from under documentation burden with ambient capture" is a problem. A good probe if they answer with a domain: "okay, and within that, what's the actual problem — what's broken or missing that you'd want to go fix?" Get 2–5 of these, and for each, ask why it matters to them if it doesn't come out naturally — that context helps distinguish genuine pull from something that just sounds good on paper.
 
-Synthesize all of this into a persona file using `assets/persona_template.md` as the structure (copy it, don't just describe it — the person should end up with a real file). Fill in Sections 1 and 2 now; Sections 3 and 4 need Step 3 and Step 4 below first.
+Synthesize all of this into a persona file using `assets/persona_template.md` as the structure (copy it, don't just describe it — the person should end up with a real file). Fill in Sections 1 and 2 now (Section 2 includes Problems of interest from item 5 above); Sections 3 and 4 need Step 3 and Step 4 below first.
 
 Read the template's own inline guidance for what "good" looks like in each section — it's written to explain the reasoning, not just list fields.
 
@@ -41,7 +42,7 @@ Ask for URLs to jobs they've applied to before — explicitly say it's fine, eve
 1. Open it (or search for the title + company if the original link is dead) and extract title, responsibilities, and stated requirements/prerequisites.
 2. Ask the person: did you apply because you wanted it, or because it seemed like a reasonable stretch? What happened? In hindsight, was it actually a good fit?
 
-Use these answers to draft the persona's Section 4 (Disqualifiers & Positive reinforcement) — this is where a generic rubric turns into a personal one. A pattern like "every clinical-operations-flavored role got rejected and in hindsight the person didn't want it anyway" becomes a standing disqualifier. A pattern like "the two roles this person got most excited about were both platform-building roles at early-stage companies" becomes a positive-reinforcement note.
+Use these answers to draft the persona's Section 4 (Disqualifiers & Positive reinforcement) — this is where a generic rubric turns into a personal one. A pattern like "every clinical-operations-flavored role got rejected and in hindsight the person didn't want it anyway" becomes a standing disqualifier. A pattern like "the two roles this person got most excited about were both platform-building roles at early-stage companies" becomes a positive-reinforcement note. If a role they got genuinely excited about maps to a problem not yet captured in Section 2's Problems of interest, that's a signal to go back and add it there too — past excitement is some of the best evidence for what belongs on that list.
 
 Also use this step to backfill the tracker (Step 6) so the first live scan doesn't re-surface anything already in this list.
 
