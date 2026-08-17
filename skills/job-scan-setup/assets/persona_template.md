@@ -129,13 +129,13 @@ Field notes (map these onto whichever backend-native property/column names the c
 - New leads: `stage = "sourced"`, `date_found` = the scan's run date.
 - `notes` = one-line fit rationale + work mode + any gate/caveat.
 - `tailored_docs_url`: populated ONLY with newly generated draft documents for roles that clear the auto-tailoring threshold (Section 8) — never point this at the person's existing, real CV/cover letter files.
-- Stage transitions (applied → interviewing → offer/rejected/withdrawn) happen via `JobStore.update()` as the person's real-world process moves, not automatically by `job-scan` itself except for the initial `sourced` stage and the `stale` stage set by the sweep (Section 9).
+- Stage transitions (applied → interviewing → offer/rejected/withdrawn) happen via `JobStore.update()` as the person's real-world process moves, not automatically by `job-scan` itself except for the initial `sourced` stage and the `closed`/`stale` stages set by Section 9's sweep and staleness flag.
 
 ---
 
 ## 7. Run protocol (what `job-scan` does each time it runs)
 
-1. Stale-posting sweep — check open, unresolved job records with real links; retire dead postings.
+1. Closed-posting sweep — check open, unresolved job records with real links; retire confirmed-dead postings to `closed`. Also flag any open record untouched past the staleness window as `stale` (Section 9).
 2. Scan configured boards for the search seeds (and, per Section 2's Problems of interest, supplemental description-level searches) across configured geographies.
 3. Score fit + location (read responsibilities, apply disqualifiers/penalties and Problem fit); test the salary rule; flag missing salary.
 4. Dedupe against existing job records.
@@ -160,11 +160,13 @@ If this feature is declined during onboarding, leave `tailored_docs_url` unset a
 
 ---
 
-## 9. Stale-posting sweep detail
+## 9. Closed-posting sweep and staleness flag
 
-Ask during onboarding whether this person wants this at all (it's cheap and generally worth it, but it does spend time following links).
+Two distinct checks, both optional — ask about each separately during onboarding, don't bundle them as one yes/no:
 
-For every open job record (stage `sourced` or `applied`) with a real `url`: follow the link. If the posting is gone/expired/no-longer-accepting, call `JobStore.retire(job_id, reason)`, preserving any prior notes. If live, capture the posted date if shown via `JobStore.update()`, without touching stage. Don't overwrite records that already carry a richer, current stage (e.g., `interviewing`, `rejected`) — for those, only note liveness if useful.
+**Closed-posting sweep** (cheap and generally worth it, but does spend time following links): for every open job record (stage `sourced` or `applied`) with a real `url`, follow the link. If the posting is gone/expired/no-longer-accepting (filled or taken down), call `JobStore.retire(job_id, reason)` — sets stage `closed`, preserving any prior notes. This is a verdict about the posting, not about the person's candidacy. If live, capture the posted date if shown via `JobStore.update()`, without touching stage. Don't overwrite records that already carry a richer, current stage (e.g., `interviewing`, `rejected`) — for those, only note liveness if useful.
+
+**Staleness flag**: ask what window counts as stale (suggest 30 days as a starting point). Any open record (`sourced` or `applied`) whose notes/stage haven't changed within that window gets set to stage `stale` via `JobStore.update()`. This is independent of the closed-posting sweep above — it's a nudge to revisit a lead, not a claim about whether the job itself is still open. A record can be `stale` and still live, or go straight to `closed` before ever going stale.
 
 **Authentication rule:** never collect, store, type, or ask for this person's account passwords. If a link is genuinely behind a login wall with no existing session, leave that record unchanged and report it under "needs sign-in" rather than attempting credentials.
 

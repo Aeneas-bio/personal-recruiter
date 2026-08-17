@@ -69,7 +69,8 @@ Write the `storage:` config block (persona backend + location, job backend + loc
 ## Step 7 — Configure optional features
 
 Ask about each of these explicitly — don't silently default them on or off:
-- **Stale-posting sweep** (retire dead postings automatically each run). Cheap, generally worth it; default to yes if the person has no preference.
+- **Closed-posting sweep** (retire confirmed-dead postings to `closed` automatically each run). Cheap, generally worth it; default to yes if the person has no preference.
+- **Staleness flag** (flag open records untouched for N days as `stale` — a nudge to revisit, distinct from the closed-posting sweep above). Ask for the window; suggest 30 days as a starting point.
 - **Auto-tailored CV/cover-letter drafts** for high-fit roles. If yes, ask which base CV and cover letter files to draft from, and what fit-score threshold should trigger it (suggest 85+ as a starting point — high enough to only fire for genuinely strong matches).
 - **Where scan summaries should go**: a chat channel (if a connector is available), an email draft, or just a saved report file the person reads when they check in. Get a specific channel ID / address if applicable — don't guess.
 - **Fit-score threshold** for adding a lead to the tracker at all (suggest 65–70 as a starting point, explain it's easy to tune down later based on feedback, matching how this system's original instance evolved).

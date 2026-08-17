@@ -22,7 +22,9 @@ Use this file during `job-scan-setup` Step 6 to pick backends, and read it again
 - `update(job_id, partial)` → record (stage moves, notes, etc.)
 - `retire(job_id, reason)` → for the stale-posting sweep
 
-`JobRecord` fields (same regardless of backend): `title, company, url, source_board, date_found, stage (sourced|applied|interviewing|offer|rejected|withdrawn|stale), fit_score, salary_min, salary_max, salary_disclosed, notes, tailored_docs_url`
+`JobRecord` fields (same regardless of backend): `title, company, url, source_board, date_found, stage (sourced|applied|interviewing|offer|rejected|withdrawn|closed|stale), fit_score, salary_min, salary_max, salary_disclosed, notes, tailored_docs_url`
+
+`closed` and `stale` are easy to conflate but mean different things: `closed` is a verdict about the posting itself (confirmed filled or taken down, set by the closed-posting sweep) — `stale` is a time-based flag on a record that hasn't changed in a configured window (default suggestion: 30 days), independent of whether the posting is still live. A record can be `stale` without being `closed`, or go straight to `closed` well before it would otherwise have gone stale.
 
 ## Capability flags — check before assuming a backend can do something
 

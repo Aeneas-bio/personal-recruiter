@@ -23,9 +23,13 @@ Read the full persona via `PersonaStore.read()`. Pay particular attention to:
 - Section 4's Disqualifiers and Positive reinforcement — these exist because a generic scorer got something wrong in the past. They override generic judgment.
 - Section 10's Calibration Log — the most recent entries are the freshest signal about what to change. If a log entry contradicts something earlier in the document, the log wins (it's the correction).
 
-## Step 2 — Stale-posting sweep (if enabled in the persona file's Section 9)
+## Step 2 — Closed-posting sweep and staleness flag (if enabled in the persona file's Section 9)
 
-Use `JobStore.list()` to get every record still open — stage `sourced` or `applied`, with no terminal outcome yet — and follow each one's `url`. If dead/expired/no-longer-accepting, call `JobStore.retire(job_id, reason)`, preserving any existing notes rather than replacing them. If live, note the posted date if shown, via `JobStore.update(job_id, {...})`, without touching stage. Don't overwrite records that already carry a richer, current stage (e.g., `interviewing`, `rejected`) — for those, only note liveness if it adds information.
+These are two separate checks on the same set of records — don't conflate them. `closed` is a verdict about the posting (it's gone); `stale` is a nudge that a record hasn't been touched in a while, regardless of whether the posting is still live.
+
+Use `JobStore.list()` to get every record still open — stage `sourced` or `applied` — and follow each one's `url`. If dead/expired/no-longer-accepting, call `JobStore.retire(job_id, reason)`, which sets stage `closed` and preserves any existing notes rather than replacing them. If live, note the posted date if shown, via `JobStore.update(job_id, {...})`, without touching stage. Don't overwrite records that already carry a richer, current stage (e.g., `interviewing`, `rejected`) — for those, only note liveness if it adds information.
+
+Separately, for every open record whose notes/stage haven't changed since the staleness window configured in the persona's Section 9 (default suggestion: 30 days), set stage `stale` via `JobStore.update()`. This runs independent of the closed-posting check above — a record can be flagged `stale` on one run and turn out to still be live, or go straight to `closed` before it ever goes stale.
 
 Never attempt to use or ask for account credentials to get past a login wall. If a link is genuinely gated with no existing session, leave it and report it under "needs sign-in" in the final summary.
 
@@ -60,7 +64,7 @@ For any new record at or above the configured fit threshold: draft a tailored CV
 ## Step 8 — Deliver the summary
 
 Send it wherever persona Section 7 configured (chat channel, email draft, or a saved report) — not somewhere else, even if another channel seems more convenient in the moment. Include:
-- Counts: postings scanned, new leads added, cold postings retired.
+- Counts: postings scanned, new leads added, postings closed, records newly flagged stale.
 - The new-leads list, each with a link, company, location (with score), salary, fit score, and any caveats.
 - A "seen but didn't make the cut" section for notable near-misses — this is often as useful to the person as the hits, especially early on while they're still tuning the rubric.
 - Anything needing sign-in, and any auto-drafted documents generated this run.
