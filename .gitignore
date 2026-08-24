@@ -1,0 +1,6 @@
+# Personal runtime output from running the job-scan skill — never commit.
+# These contain a real person's job-search data (companies, fit scores, notes).
+reports/
+
+# Auto-tailored CV / cover-letter drafts the skill generates per role at runtime.
+_AutoTailored/

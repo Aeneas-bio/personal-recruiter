@@ -6,9 +6,21 @@ _Last built: {{DATE}}_
 
 ---
 
-## 0. Storage configuration
+## 0. Environment, Access & Storage
 
-_(Filled in during `job-scan-setup` Step 6 — see `assets/storage_backends.md` for backend options and capabilities. `job-scan` reads this block on every run to know where the persona and job tracker actually live, without re-asking.)_
+_Captured during onboarding (Steps 1 and 6 of `job-scan-setup`). The `job-scan` skill and scheduled runs read this on every run — keep it current if the person changes email, browser, boards, or storage backend._
+
+### Access (pre-flight — Step 1)
+
+- **Job-search account (email):** _{{fill}}_ — the single account all board logins, profiles, saved searches, and delivered summaries key off.
+- **Browser + Claude extension:** _{{confirmed installed & enabled? date}}_ — authenticated boards are read through this logged-in session; Claude never sees, types, or stores passwords/tokens.
+- **Account hygiene confirmed:** _{{date}}_ — person confirmed that ONLY this account is logged in (no other browsers/profiles signed into different accounts).
+- **Locked-in job boards:** see Section 5 (finalized during onboarding, including any user-added paid/niche boards and any the person opted out of).
+- **Authentication rule:** sign-in happens only in the person's own browser via the extension. If a board has no active session on a run, it is reported as "needs sign-in" and skipped — never accessed via stored credentials.
+
+### Storage (Step 6)
+
+_(See `assets/storage_backends.md` for backend options and capabilities. `job-scan` reads this block to know where the persona and job tracker actually live, without re-asking.)_
 
 ```yaml
 storage:
