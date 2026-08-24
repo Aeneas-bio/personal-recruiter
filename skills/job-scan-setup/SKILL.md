@@ -11,28 +11,38 @@ Do this once per person. If you find an existing persona file and tracker alread
 
 ## Before you start: set expectations
 
-Tell the person up front, in plain terms, what this will produce: a persona file they should expect to review and correct, a tracker spreadsheet, and a recurring scheduled task. Let them know the first couple of scans will probably need tuning — this mirrors how a real search assistant would ramp up, not a one-shot config wizard. This sets the right expectation that Step 9 below (the calibration log) is not optional polish, it's how the system actually gets good.
+Tell the person up front, in plain terms, what this will produce: a persona file they should expect to review and correct, a tracker, and a recurring scheduled task. Let them know two things: (1) the first couple of scans will probably need tuning — this mirrors how a real search assistant would ramp up, not a one-shot config wizard, and Step 9's calibration log is where that tuning sticks; and (2) there is a short **pre-flight** (Step 1) that gets their browser and accounts into the right state before any scanning — doing this first prevents the most common onboarding problems (wrong account read, credentials confusion, gated postings invisible).
 
-## Step 1 — Confirm access to the tools this will actually use
+## Step 1 — Pre-flight: browser, authentication & account hygiene (do this FIRST, and gate on it)
 
-The scan itself needs a browser automation connector (e.g., Claude in Chrome or equivalent) to read job postings and, on some boards, to browse while logged in. If the person doesn't have one connected yet, tell them plainly and point them to wherever their environment manages connectors — don't try to install anything yourself, and don't ask for or handle any of their credentials directly. Logging into a specific job board (if they want that for better results on gated postings) happens in their own browser session, never through you.
+This system reads job boards through the person's **own logged-in browser**, never through credentials you handle. Getting the browser and account state right before anything else is what separates a clean onboarding from a confusing one. Treat the first three checks as **hard gates** — do not move on to building the persona, choosing boards, or scanning until they pass.
 
-Also check (don't assume) whether the following are available and ask the person if they want to use them:
+1. **Claude browser extension installed — REQUIRED (hard gate).** Confirm the person has the Claude browser extension installed and enabled. This is what handles authentication to job boards and keeps their **passwords and tokens out of Claude entirely** — Claude never sees, types, or stores credentials; the person stays logged in in their own browser and Claude reads through that live session. If the extension isn't installed, **stop here** and point them to install it before continuing. Never work around a missing extension by asking for a password, token, or API key.
+
+2. **Confirm the exact email to use — REQUIRED (hard gate).** Ask which email account this job search should run under, and read it back to confirm. Everything keys off this one account: board logins, profiles, saved searches, and any delivered summaries. Note it down to persist later (persona Section 0).
+
+3. **One logged-in user, and it's that account — REQUIRED (confirm-gate).** Ask the person to ensure that **only** the target account is logged in in the browser Claude will drive, and that other browsers or browser profiles signed into different accounts are **closed**. A second identity logged in elsewhere (a personal Google/LinkedIn alongside the work one) is a common cause of the scan reading the wrong profile or the wrong recommendations. Get an explicit "yes — only that account is logged in" before proceeding; don't just remind and move on. If you have browser tools, you may optionally spot-check the active session's account, but the person's explicit confirmation is the gate.
+
+Then confirm the **supporting capabilities** (flag anything missing, but these are not hard gates):
 - A storage backend for the persona and job tracker — see `assets/storage_backends.md` for the options (Notion, Jira+Confluence, GitHub, local file, or Google Drive) and what each connector needs. This gets chosen properly in Step 6; here just confirm which connectors actually exist so Step 6 isn't guessing.
-- A document-editing capability (needed if they want auto-tailored CV/cover-letter drafts).
-- A chat tool connector (Slack, Teams, email) if they want scan summaries delivered somewhere instead of just saved to a file.
-- A task-scheduling capability, to actually make the scan recurring.
+- Document editing (only if they want auto-tailored CV/cover-letter drafts).
+- A chat/email connector (Slack, Teams, email) if they want summaries delivered somewhere instead of a saved file.
+- Task scheduling, to make the scan recurring.
+
+**Standing authentication rule (applies here and everywhere in this system):** never collect, store, type, or ask for the person's passwords, tokens, or API keys. Authenticated access always happens in their own browser via the extension. If a board can't be read because no session is active, the scan reports "needs sign-in" rather than touching credentials.
 
 ## Step 2 — Build the persona (who this person is today)
 
-Ask for, in this order:
+Create the persona file now from `assets/persona_template.md` (copy it to a real file wherever they keep career files — the person should end up with an actual file, not a description). As you create it, **record the pre-flight results from Step 1 into the persona's Section 0 (Environment, Access & Storage)**: the confirmed job-search email, that the browser + Claude extension are installed/enabled, the date they confirmed only that account is logged in, and the standing authentication rule. (The storage-backend half of Section 0 gets finalized in Step 6 — leave it as placeholders for now.)
+
+Then build Sections 1 and 2 by asking for, in this order:
 1. **A folder or set of files of their CVs/resumes** — including old versions if they have them; a resume that changed over 3 jobs tells you more about trajectory than the latest one alone.
 2. **A folder or set of cover letters**, if they have any saved. Cover letters are the best source for a person's actual voice and stated motivation — mine them for language, not just facts.
 3. **Their LinkedIn profile URL, and recent posts if they write publicly.** If you have browser access, read the profile directly rather than asking them to describe it.
 4. **Direct follow-up questions** to fill gaps the documents don't cover: certifications, side projects, specific tools/platforms they're deep in but might not have listed, what they'd say is their biggest unlisted strength, and — importantly — what they explicitly do NOT want to keep doing even if it's adjacent to their experience.
 5. **Problems of interest.** Ask this as its own, separate question — it's easy to conflate with domain and the two aren't the same thing. Don't ask "what industry?" Ask: "what specific problems do you actually want to be solving in your next role?" Push for the shape of the problem, not a domain label — "healthcare AI" is a domain; "getting clinicians out from under documentation burden with ambient capture" is a problem. A good probe if they answer with a domain: "okay, and within that, what's the actual problem — what's broken or missing that you'd want to go fix?" Get 2–5 of these, and for each, ask why it matters to them if it doesn't come out naturally — that context helps distinguish genuine pull from something that just sounds good on paper.
 
-Synthesize all of this into a persona file using `assets/persona_template.md` as the structure (copy it, don't just describe it — the person should end up with a real file). Fill in Sections 1 and 2 now (Section 2 includes Problems of interest from item 5 above); Sections 3 and 4 need Step 3 and Step 4 below first.
+Fill in Sections 1 and 2 now (Section 2 includes Problems of interest from item 5 above); Sections 3 and 4 need Step 3 and Step 4 below first.
 
 Read the template's own inline guidance for what "good" looks like in each section — it's written to explain the reasoning, not just list fields.
 
@@ -52,9 +62,15 @@ Show the person the career-arc summary from Step 2 and ask directly: what senior
 
 A common failure mode worth watching for explicitly: title-based search under-surfaces a level the person actually wants because the search seeds only used one phrasing. If Director-level (or whatever their target level is) is in scope, make sure the seed list includes that level's variants explicitly, not just the more senior titles that happen to come to mind first.
 
-## Step 5 — Choose job boards
+## Step 5 — Choose and lock in job boards
 
-Propose the generic core list from `assets/default_job_boards.md`, then ask two direct questions: "any boards you already use or trust?" and "is there an industry-specific board for your field?" (there almost always is one, and it's often where the best senior postings with transparent salary bands live). Write the final list into persona Section 5.
+Boards are only as useful as the account behind them, so this step ties back to Step 1's confirmed email. Work through it in order and don't lock the list until the person has had a chance to customize it.
+
+1. **Confirm the boards run under the same job-search account.** Remind the person that every board should be logged in under the same email confirmed in Step 1 — mismatched accounts are a common source of weak or wrong results.
+2. **Enumerate the boards that will be referenced.** Propose the generic core from `assets/default_job_boards.md`, plus the industry-specific board(s) for their field (ask — there's almost always one, and it's frequently where the best senior, salary-transparent roles live). List the full proposed set back to them explicitly so they can see exactly what will be scanned.
+3. **Ask them to log in and set up / complete a profile on each board they're keeping** (if they haven't already). A complete, current profile meaningfully improves targeting and, on some boards, unlocks positions that aren't visible to logged-out or bare accounts. Prompt them to do this and **trust their confirmation** — you don't need to verify each login yourself.
+4. **Let them customize the list before you lock it.** Explicitly invite them to: (a) **add** any boards not in the defaults — including paid/subscription or niche boards they use (these are read through their own logged-in session, never via credentials you handle); and (b) **remove** any boards they don't want scanned. Capture the exact search-results URL for any board where they already have a saved/filtered search.
+5. **Lock in the final list.** Write it into persona Section 5, and update persona Section 0 (Environment, Access & Storage) to reflect the locked board set (including user adds/removes). For any paid/login-gated board, note in Section 5 that it is read via the person's logged-in session only, with a "needs sign-in" fallback.
 
 ## Step 6 — Choose storage and build the tracker
 
@@ -89,4 +105,4 @@ Example shape for the scheduled task prompt (fill in the brackets, don't ship th
 
 ## Step 9 — Wrap up
 
-Summarize what was built (persona file, tracker, scheduled task and its cadence) and say plainly that the first couple of runs are a tuning period — encourage the person to correct anything the scan gets wrong (a missed role, an over-eager match, a disqualifier that should exist) and note that feedback belongs in the persona file's Calibration Log (Section 10) so it sticks. Offer to run the first scan immediately rather than waiting for the schedule, so they get a concrete result to react to right away.
+Summarize what was built (persona file including its Environment, Access & Storage section, tracker, scheduled task and its cadence) and say plainly that the first couple of runs are a tuning period — encourage the person to correct anything the scan gets wrong (a missed role, an over-eager match, a disqualifier that should exist) and note that feedback belongs in the persona file's Calibration Log (Section 10) so it sticks. Remind them of what keeps the scan working run-to-run: stay signed in to their boards under the confirmed account in the browser Claude drives, and — if the tracker lives in a local spreadsheet file — keep it closed when a scan is scheduled to run so it can be written. Offer to run the first scan immediately rather than waiting for the schedule, so they get a concrete result to react to right away.
