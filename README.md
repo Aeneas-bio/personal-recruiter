@@ -1,4 +1,4 @@
-**Personal Recruiter**
+# Personal Recruiter
 
 ![personal-recruiter](assets/banner.svg)
 
