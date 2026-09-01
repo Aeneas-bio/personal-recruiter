@@ -70,3 +70,7 @@ For comprehensive details on architecture, storage backends, persona tuning, and
 - Storage backend abstraction (`PersonaStore` / `JobStore`) is designed and wired into both `job-scan-setup` and `job-scan`.
 - Persona-review skill is built and integrated into the setup and scan workflows.
 - All three skills are production-ready.
+
+## License
+
+job-scan-toolkit is licensed under the [Business Source License 1.1](LICENSE). Free to use, copy, and modify, including production use, with one restriction: you may not offer it (or a derivative) as a hosted service to third parties, or use it to build a competing commercial job-search/recruiting product, without a separate commercial license from Aeneas Bio, Inc. It converts to the Apache License 2.0 on 2030-09-01. Aeneas Bio retains all rights in the project and sole discretion over future license terms. See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution and review process.
