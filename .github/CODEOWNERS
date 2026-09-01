@@ -1,0 +1,6 @@
+# Every path requires review from a repository admin before merging,
+# per CONTRIBUTING.md's contribution review process.
+# This file only takes effect once branch protection on `main` has
+# "Require review from Code Owners" enabled (Settings > Branches) -
+# that setting is not controllable from this pull request.
+* @islandhopper81 @aeneas-vw
