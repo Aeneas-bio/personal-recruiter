@@ -15,6 +15,8 @@ You need, at minimum:
 
 Both the persona and job backends, and their locations, come from the `storage:` block in persona Section 0 (see `job-scan-setup/assets/storage_backends.md`). Read that block first — before anything else — to know which `PersonaStore`/`JobStore` implementation to use for the rest of this run. Persona and job backends can differ (e.g. persona in Notion, jobs in Jira); never assume they match. All storage operations below go through the `PersonaStore`/`JobStore` interface, never backend-specific mechanics directly — if a step here describes something a chosen backend can't do in-place (see the capability table in `storage_backends.md`), say so rather than working around it silently.
 
+**If `job_backend` is `google_drive` or `onedrive`**, `job_location` is a folder, not a fixed filename — before any `JobStore` operation this run, resolve the actual current file by listing everything matching `JobTracker*` in that folder and applying the filename-based ordering rule in `storage_backends.md`'s rotation scheme (closest date, then highest numeric suffix — never trust modified-time metadata for this). Every `JobStore` read in this run targets that resolved file; every `JobStore` write this run produces happens at Step 6, as one new rotated file, not as in-place edits to the resolved file.
+
 If the persona location, job tracker location, or the `storage:` block itself is missing or clearly stale/placeholder (template text never filled in), stop and say so rather than guessing — this almost always means onboarding wasn't finished, and a scan run on an empty rubric produces noise, not leads.
 
 ## Step 1 — Load the persona and treat it as the rubric of record
@@ -30,6 +32,8 @@ These are two separate checks on the same set of records — don't conflate them
 Use `JobStore.list()` to get every record still open — stage `sourced` or `applied` — and follow each one's `url`. If dead/expired/no-longer-accepting, call `JobStore.retire(job_id, reason)`, which sets stage `closed` and preserves any existing notes rather than replacing them. If live, note the posted date if shown, via `JobStore.update(job_id, {...})`, without touching stage. Don't overwrite records that already carry a richer, current stage (e.g., `interviewing`, `rejected`) — for those, only note liveness if it adds information.
 
 Separately, for every open record whose notes/stage haven't changed since the staleness window configured in the persona's Section 9 (default suggestion: 30 days), set stage `stale` via `JobStore.update()`. This runs independent of the closed-posting check above — a record can be flagged `stale` on one run and turn out to still be live, or go straight to `closed` before it ever goes stale.
+
+**On Google Drive or OneDrive**, every `retire()`/`update()` call in this step is staged in memory against the resolved current file's contents, not written anywhere yet — the actual write happens once, at Step 6, as this run's single new rotated file containing all of this step's changes plus anything Step 6 itself adds. Don't write a file after this step and another after Step 6; batch everything into the one dated file this run produces.
 
 Never attempt to use or ask for account credentials to get past a login wall. If a link is genuinely gated with no existing session, leave it and report it under "needs sign-in" in the final summary.
 
@@ -57,9 +61,18 @@ Never add a record that's already in the tracker. Check via `JobStore.find_by_ur
 
 Create one record per qualifying role via `JobStore.create(record)`, populated with the standard `JobRecord` fields (`title, company, url, source_board, date_found, stage, fit_score, salary_min, salary_max, salary_disclosed, notes, tailored_docs_url`) as defined in `storage_backends.md` — the field set is the same regardless of backend, so no backend-specific column mapping is needed here. New records start at stage `sourced`. If the backend's create operation fails or returns something unexpected, don't retry blindly — surface it in the summary rather than silently dropping the lead.
 
+**On Google Drive or OneDrive, this step is where every staged change actually gets written**, as a single new rotated file, following `storage_backends.md`'s rotation scheme exactly:
+1. Take the resolved current file's full contents (already read at the start of this run) plus every staged change from Step 2 (retires, staleness flags, liveness notes) plus this step's new records.
+2. Determine today's filename: `JobTracker_{{DATE}}` where `{{DATE}}` is this run's date; if one or more files already exist for today (check the folder listing again — don't assume from the start-of-run resolution, since this run itself is what's adding today's entry), append the next zero-padded counter (`_01`, `_02`, ...).
+3. Write the combined contents as that new file, in the format recorded in `job_file_format` (`xlsx` or `ods`; always `xlsx` for OneDrive), with the same formatting as every prior file in the sequence (bold header, frozen row 1 — see `tracker_template_spec.md`).
+4. Count dated files now present (excluding the bare undated original). If a 3rd now exists, delete the oldest by the same date/suffix ordering — never the undated original.
+5. If today's new file has one or more same-day siblings from an earlier run today, note that plainly in Step 8's summary as an advisory (not automatic) cleanup suggestion — see `storage_backends.md` for exact phrasing guidance.
+
+This means a Drive/OneDrive run produces exactly one file-write operation for the whole run, not one per record and not one per step — batch everything into it.
+
 ## Step 7 — Auto-tailor documents, if enabled (persona Section 8)
 
-For any new record at or above the configured fit threshold: draft a tailored CV and cover letter from the person's real base documents, using the document-editing capability available in this environment. Keep every claim truthful to the persona file — never invent experience, credentials, or accomplishments the person doesn't actually have, even if it would make the fit look stronger. Save drafts to a per-job folder with `_draft` in every filename, and record the link via `JobStore.update(job_id, {tailored_docs_url: ...})`. Never point that field at the person's pre-existing real documents.
+For any new record at or above the configured fit threshold: draft a tailored CV and cover letter from the person's real base documents, using the document-editing capability available in this environment. Keep every claim truthful to the persona file — never invent experience, credentials, or accomplishments the person doesn't actually have, even if it would make the fit look stronger. Save drafts to a per-job folder with `_draft` in every filename, and record the link via `JobStore.update(job_id, {tailored_docs_url: ...})`. Never point that field at the person's pre-existing real documents. **On Google Drive or OneDrive**, this update is staged the same way Step 2's are — it lands in Step 6's single batched rotation write, not a separate file write here.
 
 ## Step 8 — Deliver the summary
 
@@ -68,6 +81,7 @@ Send it wherever persona Section 7 configured (chat channel, email draft, or a s
 - The new-leads list, each with a link, company, location (with score), salary, fit score, and any caveats.
 - A "seen but didn't make the cut" section for notable near-misses — this is often as useful to the person as the hits, especially early on while they're still tuning the rubric.
 - Anything needing sign-in, and any auto-drafted documents generated this run.
+- **On Google Drive or OneDrive**, if this run's new file has a same-day sibling from an earlier run today, a plain-language note that the earlier file is now superseded and safe to delete if the person wants to tidy up (never delete it automatically — see `storage_backends.md`).
 
 If nothing new qualified, say so plainly rather than padding the summary — a quiet week in the market is real information too.
 
