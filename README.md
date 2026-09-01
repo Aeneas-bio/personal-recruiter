@@ -31,15 +31,17 @@ Each scan run produces:
 
 ### 1. Setup (one-time)
 Run `job-scan-setup`. You'll be guided through:
+- Your CVs/resumes and cover letters (a local folder/file path, or a cloud location if you have a connector for it) — mined for your trajectory, skills, and actual voice, including old versions
+- Your history of past applications, including rejections — a URL if you have one, or just title + company if you don't; both count
 - Your target job titles and seniority level
 - The problems or domains you want to solve
-- Disqualifiers (roles or companies you want to avoid)
+- Disqualifiers (roles or companies you want to avoid), built partly from what your past applications reveal
 - Which job boards to scan
 - Location preferences
 - Where to store your tracker (Notion, GitHub, Google Drive, etc.)
 - Calibration thresholds and scoring weights
 
-The skill creates your persona file, initializes your job tracker, and schedules the recurring scan task.
+The skill creates your persona file, initializes your job tracker (backfilled from your past applications so the first scan doesn't re-surface anything), and schedules the recurring scan task.
 
 ### 2. Recurring Scans (automated or on-demand)
 Run `job-scan` on a cadence (weekly, bi-weekly, or ad-hoc). Each run:
