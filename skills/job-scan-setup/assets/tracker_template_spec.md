@@ -33,8 +33,8 @@ Row 1 headers, exactly this order and these names (the `job-scan` skill's write 
 
 ## Backfilling from past applications
 
-If the person supplied URLs to jobs they've already applied to (from the `job-scan-setup` interview step on job history), add one row per job with whatever fields are known:
-- Title, Company, Job Link — always fill if the URL resolves
+If the person supplied a history of jobs they've already applied to (from the `job-scan-setup` interview step on job history — by URL, or by title + company alone when no link exists or was recoverable), add one row per job with whatever fields are known:
+- Title, Company — always fill; Job Link — fill if a URL was recovered, otherwise leave blank rather than skipping the row
 - Apply Date — ask the person, or leave blank if unknown
 - Outcome — ask the person ("rejected", "no response", "interviewed but no offer", "still waiting," etc.) — don't guess
 - Decision Date — only if the person knows/remembers it, or the sweep step later determines the posting is dead

@@ -56,13 +56,15 @@ or invoke it directly:
 ```
 
 The skill will guide you through a conversation to:
-1. Define your target job titles and seniority level
-2. Describe the problems or domains you want to solve
-3. List any disqualifiers (companies, roles, or conditions you want to avoid)
-4. Choose which job boards to scan (LinkedIn, Indeed, AngelList, etc.)
-5. Set location preferences
-6. Pick your storage backend (Google Drive, Notion, GitHub, etc.) and provide access credentials
-7. Calibrate scoring thresholds and weights
+1. Provide your CVs/resumes and cover letters — point it at a local folder/file path, or a cloud location if you have a connector for it (old versions welcome; they show your trajectory)
+2. Walk through your past applications, including rejections — a URL if you have one, or just title + company if you don't
+3. Define your target job titles and seniority level
+4. Describe the problems or domains you want to solve
+5. List any disqualifiers (companies, roles, or conditions you want to avoid)
+6. Choose which job boards to scan (LinkedIn, Indeed, AngelList, etc.)
+7. Set location preferences
+8. Pick your storage backend (Google Drive, Notion, GitHub, etc.) — no passwords, tokens, or API keys to hand over; storage connects through a connector you've already authorized (or your local filesystem), and job-board access separately runs through your own logged-in browser session via the Claude extension
+9. Calibrate scoring thresholds and weights
 
 **Time**: 10-15 minutes first time.
 
