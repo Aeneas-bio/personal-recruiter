@@ -1,3 +1,4 @@
+**Personal Recruiter**
 ![personal-recruiter](assets/banner.svg)
 
 ![Claude Skill](https://img.shields.io/badge/claude-skill-AAAAAA?style=flat&labelColor=010906)
