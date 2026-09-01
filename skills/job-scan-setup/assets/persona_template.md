@@ -186,6 +186,6 @@ Two distinct checks, both optional — ask about each separately during onboardi
 
 ## 10. Calibration log
 
-_(Empty at first. Every time this person gives feedback on a scan's results — "you missed X," "stop surfacing Y," "actually that one's a great fit, here's why" — add a dated entry here summarizing the feedback and the rule change it produced. This log is what keeps the rubric from drifting back to generic keyword-matching over time. If this system is running somewhere with a persistent-memory feature, also save durable lessons there so they survive across sessions, not just in this file.)_
+_(Empty at first. Every time this person gives feedback on a scan's results — "you missed X," "stop surfacing Y," "actually that one's a great fit, here's why" — add a dated entry here summarizing the feedback and the rule change it produced. This log is what keeps the rubric from drifting back to generic keyword-matching over time. If this system is running somewhere with a persistent-memory feature, also save durable lessons there so they survive across sessions, not just in this file. For anything beyond a quick single correction, the `persona-review` skill runs a guided session for exactly this — it's the better path for the person to use directly rather than editing this document by hand.)_
 
 - **{{DATE}}:
