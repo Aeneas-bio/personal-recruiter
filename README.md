@@ -17,24 +17,24 @@ It's built as a set of three Claude skills that work together: one for setup, on
 
 ## Core Features
 
-▸ **Personalized scanning** — Define your target seniority, problem domain, location scope, and disqualifiers once. The system remembers and uses them.
-▸ **Multi-board coverage** — Scans your chosen job boards (LinkedIn, Indeed, AngelList, Blind, etc.) in a single run.
-▸ **Intelligent filtering** — Scores each posting against your personal rubric and your stated goals, not just keyword matching.
-▸ **Deduplication** — Tracks what you've already seen and skips repeats across scan runs.
-▸ **Tailored documents** — Optionally auto-drafts CV and cover letter variants for standout matches based on each role.
-▸ **Flexible storage** — Works with Notion, Jira+Confluence, GitHub, Google Drive, or local files for your job tracker.
-▸ **On-demand calibration** — Refine your preferences mid-search through guided conversations grounded in real tracker data, not hand-editing.
+* **Personalized scanning** — Define your target seniority, problem domain, location scope, and disqualifiers once. The system remembers and uses them.
+* **Multi-board coverage** — Scans your chosen job boards (LinkedIn, Indeed, AngelList, Blind, etc.) in a single run.
+* **Intelligent filtering** — Scores each posting against your personal rubric and your stated goals, not just keyword matching.
+* **Deduplication** — Tracks what you've already seen and skips repeats across scan runs.
+* **Tailored documents** — Optionally auto-drafts CV and cover letter variants for standout matches based on each role.
+* **Flexible storage** — Works with Notion, Jira+Confluence, GitHub, Google Drive, or local files for your job tracker.
+* **On-demand calibration** — Refine your preferences mid-search through guided conversations grounded in real tracker data, not hand-editing.
 
 ## Core Outputs
 
 Each scan run produces:
 
-▸ **Summary briefing** — High-level report of what was scanned, how many new qualified leads were found, and highlights of standout matches. Posted to Slack on your schedule:
+* **Summary briefing** — High-level report of what was scanned, how many new qualified leads were found, and highlights of standout matches. Posted to Slack on your schedule:
 
   <img src="assets/SlackPost.png" alt="Example summary briefing posted to Slack" width="640">
-▸ **Updated job tracker** — New leads appended, stale postings marked dead, your running record stays current.
-▸ **Optional application drafts** — For top-fit roles, ready-to-edit CV and cover letter tailored to that position.
-▸ **Engagement log** — Records which roles you've actioned, skipped, or marked as interested for future reference.
+* **Updated job tracker** — New leads appended, stale postings marked dead, your running record stays current.
+* **Optional application drafts** — For top-fit roles, ready-to-edit CV and cover letter tailored to that position.
+* **Engagement log** — Records which roles you've actioned, skipped, or marked as interested for future reference.
 
 ## Sample tracker output
 
@@ -90,6 +90,6 @@ Refine your preferences anytime. Instead of hand-editing your persona file or wa
 
 ## Status
 
-▸ Storage backend abstraction (`PersonaStore` / `JobStore`) is designed and wired into both `job-scan-setup` and `job-scan`.
-▸ Persona-review skill is built and integrated into the setup and scan workflows.
-▸ All three skills are production-ready.
+* Storage backend abstraction (`PersonaStore` / `JobStore`) is designed and wired into both `job-scan-setup` and `job-scan`.
+* Persona-review skill is built and integrated into the setup and scan workflows.
+* All three skills are production-ready.
